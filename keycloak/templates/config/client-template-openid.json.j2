@@ -1,0 +1,79 @@
+{
+  "id" : "{{ keycloak.settings.id.client_template_openid }}",
+  "name" : "OpenID-Template",
+  "protocol" : "openid-connect",
+  "attributes" : {
+    "display.on.consent.screen" : "false"
+  },
+  "protocolMappers" : [ {
+    "id" : "591edb9c-0603-4685-b79e-07056585e9d0",
+    "name" : "group list",
+    "protocol" : "openid-connect",
+    "protocolMapper" : "oidc-group-membership-mapper",
+    "consentRequired" : false,
+    "config" : {
+      "claim.name" : "group",
+      "userinfo.token.claim" : "true"
+    }
+  }, {
+    "id" : "ab2ee34a-dc64-4f63-95cf-e10e0c3b9f2d",
+    "name" : "property locale",
+    "protocol" : "openid-connect",
+    "protocolMapper" : "oidc-usermodel-property-mapper",
+    "consentRequired" : false,
+    "config" : {
+      "user.attribute" : "locale",
+      "claim.name" : "locale",
+      "jsonType.label" : "String",
+      "userinfo.token.claim" : "true"
+    }
+  }, {
+    "id" : "90bf365c-ecc6-470a-9947-2ab2335696cc",
+    "name" : "property first name",
+    "protocol" : "openid-connect",
+    "protocolMapper" : "oidc-usermodel-property-mapper",
+    "consentRequired" : false,
+    "config" : {
+      "user.attribute" : "firstName",
+      "claim.name" : "firstName",
+      "jsonType.label" : "String",
+      "userinfo.token.claim" : "true"
+    }
+  }, {
+    "id" : "0e7d9a26-42fb-47cd-8ce0-ab243d2bd3d4",
+    "name" : "property last name",
+    "protocol" : "openid-connect",
+    "protocolMapper" : "oidc-usermodel-property-mapper",
+    "consentRequired" : false,
+    "config" : {
+      "user.attribute" : "lastName",
+      "claim.name" : "lastName",
+      "jsonType.label" : "String",
+      "userinfo.token.claim" : "true"
+    }
+  }, {
+    "id" : "319f462a-ac17-47f6-b112-24a554fde163",
+    "name" : "property user name",
+    "protocol" : "openid-connect",
+    "protocolMapper" : "oidc-usermodel-property-mapper",
+    "consentRequired" : false,
+    "config" : {
+      "user.attribute" : "username",
+      "claim.name" : "username",
+      "jsonType.label" : "String",
+      "userinfo.token.claim" : "true"
+    }
+  }, {
+    "id" : "bd8232df-bf8b-4cfb-8d91-b1da47628706",
+    "name" : "property email",
+    "protocol" : "openid-connect",
+    "protocolMapper" : "oidc-usermodel-property-mapper",
+    "consentRequired" : false,
+    "config" : {
+      "user.attribute" : "email",
+      "claim.name" : "email",
+      "jsonType.label" : "String",
+      "userinfo.token.claim" : "true"
+    }
+  } ]
+}

@@ -1,0 +1,9 @@
+#!/bin/bash
+
+BACKUP_DIR="{{ ldap.backup_dir }}"
+
+mkdir -p $BACKUP_DIR
+cd $BACKUP_DIR
+
+/usr/sbin/slapcat -b cn=config | /bin/gzip > config.ldif.gz
+/usr/sbin/slapcat | /bin/gzip > data.ldif.gz

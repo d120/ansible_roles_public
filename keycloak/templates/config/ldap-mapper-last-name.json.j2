@@ -1,0 +1,14 @@
+{
+  "id" : "{{ keycloak.settings.id.ldap_mapper_last_name }}",
+  "name" : "last name",
+  "providerId" : "user-attribute-ldap-mapper",
+  "providerType" : "org.keycloak.storage.ldap.mappers.LDAPStorageMapper",
+  "parentId" : "{{ keycloak.settings.id.user_federation_ldap }}",
+  "config" : {
+    "ldap.attribute" : [ "sn" ],
+    "is.mandatory.in.ldap" : [ "true" ],
+    "always.read.value.from.ldap" : [ "false" ],
+    "read.only" : [ "false" ],
+    "user.model.attribute" : [ "lastName" ]
+  }
+}

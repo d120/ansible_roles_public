@@ -1,0 +1,18 @@
+---
+- name: "Hash LDAP root password"
+  command: "slappasswd -h '{CRYPT}' -c '{{ ldap.root_password_salt }}' -s {{ ldap.root_password }}"
+  register: local_ldap_root_password_hash
+  changed_when: False
+  tags: ldap
+
+- name: "Set root DN credentials"
+  ldap_attr:
+    dn: "olcDatabase={1}mdb,cn=config"
+    name: "{{ item.key }}"
+    values: "{{ item.value }}"
+    state: exact
+  with_dict:
+    olcSuffix: "{{ ldap.base_dn }}"
+    olcRootDN: "{{ ldap.root_dn }}"
+    olcRootPW: "{{ local_ldap_root_password_hash.stdout }}"
+  tags: ldap

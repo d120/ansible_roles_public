@@ -1,0 +1,124 @@
+---
+- name: "Create PostgreSQL database 'keycloak'."
+  postgresql_db:
+    name: "{{ keycloak.db.database }}"
+    encoding: UTF-8
+    state: present
+  tags: keycloak
+
+- name: "Create PostgreSQL user 'keycloak' with 'keycloak.*:ALL'."
+  postgresql_user:
+    db: "{{ keycloak.db.database }}"
+    name: "{{ keycloak.db.username }}"
+    password: "{{ keycloak.db.password }}"
+    priv: ALL
+  tags: keycloak
+
+- name: "Create unpriviledged user for running Keycloak."
+  user:
+    name: keycloak
+    shell: /usr/sbin/nologin
+    system: true
+    create_home: false
+  tags: keycloak
+
+- name: "Create required directories."
+  file: path={{ item }} state=directory
+  with_items:
+    - /root/ansible-keycloak
+    - "{{ keycloak.settings.dest }}/modules/system/layers/keycloak/org/postgresql/main"
+  tags: keycloak
+
+- name: "Download and unpack Keycloak tarball."
+  unarchive:
+    src: "{{ keycloak.settings.dist_url }}"
+    dest: /root/ansible-keycloak
+    remote_src: true
+    creates: "/root/ansible-keycloak/{{ keycloak.settings.dist_dir }}"
+  register: downloaded
+  notify: restart keycloak
+  tags: keycloak
+
+- name: "Check if Keycloak does exist."
+  stat:
+    path: "{{ keycloak.settings.dest }}/bin/launcher.jar"
+  register: keycloak_exists
+  tags: keycloak
+
+- name: "Copy Keycloak files in place."
+  shell: "cp -rT '/root/ansible-keycloak/{{ keycloak.settings.dist_dir }}' '{{ keycloak.settings.dest }}'"
+  when: not keycloak_exists.stat.exists or downloaded.changed
+  register: copied
+  notify: restart keycloak
+  tags: keycloak
+
+- name: "Ensure permissions are set correctly."
+  file:
+    path: "{{ keycloak.settings.dest }}"
+    owner: keycloak
+    group: keycloak
+    mode: u=rwX,g=rX,o=
+    recurse: true
+  notify: restart keycloak
+  when: copied.changed
+  tags: keycloak
+
+- name: "Download PostgreSQL driver."
+  get_url:
+    url: "{{ keycloak.settings.db_driver_url }}"
+    dest: "{{ keycloak.settings.dest }}/modules/system/layers/keycloak/org/postgresql/main/{{ keycloak.settings.db_driver_filename }}"
+    owner: keycloak
+    group: keycloak
+  notify: restart keycloak
+  tags: keycloak
+
+- name: "Configure PostgreSQL driver module."
+  template:
+    src: templates/postgresql-module.xml.j2
+    dest: "{{ keycloak.settings.dest }}/modules/system/layers/keycloak/org/postgresql/main/module.xml"
+    owner: keycloak
+    group: keycloak
+  notify: restart keycloak
+  tags: keycloak
+
+- name: "Configure Keycloak."
+  template:
+    src: templates/standalone.xml.j2
+    dest: "{{ keycloak.settings.dest }}/standalone/configuration/standalone.xml"
+    owner: keycloak
+    group: keycloak
+    mode: '0600'
+  notify: restart keycloak
+  tags: keycloak
+
+- name: "Deploy SystemD file."
+  template:
+    src: templates/keycloak.service.j2
+    dest: /etc/systemd/system/keycloak.service
+  tags: keycloak
+
+- name: "Deploy d120 theme"
+  copy:
+    src: files/d120.jar
+    dest: "{{ keycloak.settings.dest }}/standalone/deployments"
+    owner: keycloak
+    group: keycloak
+  tags: keycloak
+
+- name: "Ensure keycloak is started and enabled on boot."
+  service:
+    name: keycloak
+    state: started
+    enabled: true
+    daemon_reload: true
+  tags: keycloak
+
+- name: "Create admin user."
+  shell: |
+    ./bin/add-user-keycloak.sh -r master -u {{ keycloak.settings.admin_user }} -p {{ keycloak.settings.admin_password }}
+    touch admin-user-created
+  args:
+    chdir: "{{ keycloak.settings.dest }}"
+    creates: "{{ keycloak.settings.dest }}/admin-user-created"
+  notify: restart keycloak
+  tags: keycloak

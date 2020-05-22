@@ -1,0 +1,42 @@
+dn: cn=d120extension,cn=schema,cn=config
+objectClass: olcSchemaConfig
+cn: d120extension
+structuralObjectClass: olcSchemaConfig
+olcAttributeTypes: {0}( 1.3.6.1.4.1.8301.120.2.2.1 NAME 'birthdate' DESC 'Th
+ e date of birth of a person' EQUALITY generalizedTimeMatch SYNTAX 1.3.6.1.4
+ .1.1466.115.121.1.24 SINGLE-VALUE )
+olcAttributeTypes: {1}( 1.3.6.1.4.1.8301.120.2.2.2 NAME 'mailAlias' DESC 'An
+  alias' EQUALITY caseIgnoreIA5Match SUBSTR caseIgnoreSubstringsMatch SYNTAX
+  1.3.6.1.4.1.1466.115.121.1.26{256} )
+olcAttributeTypes: {2}( 1.3.6.1.4.1.8301.120.2.2.3 NAME 'mailTarget' DESC 'A
+ n target' EQUALITY caseIgnoreIA5Match SUBSTR caseIgnoreSubstringsMatch SYNT
+ AX 1.3.6.1.4.1.1466.115.121.1.26{256} )
+olcAttributeTypes: {3}( 1.3.6.1.4.1.8301.120.2.2.4 NAME 'birthyear' DESC 'Th
+ e year of birth of a person' EQUALITY integerMatch ORDERING integerOrdering
+ Match SYNTAX 1.3.6.1.4.1.1466.115.121.1.27 SINGLE-VALUE )
+olcAttributeTypes: {4}( 1.3.6.1.4.1.8301.120.2.2.5 NAME 'birthmonth' DESC 'T
+ he month of birth of a person' EQUALITY integerMatch ORDERING integerOrderi
+ ngMatch SYNTAX 1.3.6.1.4.1.1466.115.121.1.27 SINGLE-VALUE )
+olcAttributeTypes: {5}( 1.3.6.1.4.1.8301.120.2.2.6 NAME 'birthday' DESC 'The
+  day of birth of a person' EQUALITY integerMatch ORDERING integerOrderingMa
+ tch SYNTAX 1.3.6.1.4.1.1466.115.121.1.27 SINGLE-VALUE )
+olcObjectClasses: {0}( 1.3.6.1.4.1.8301.120.2.1.1 NAME 'd120person' DESC 'Ad
+ aption of RCF798' SUP top STRUCTURAL MUST ( cn $ givenName $ displayName $ 
+ sn ) MAY ( uid $ homePhone $  mail $ mobile $ facsimileTelephoneNumber $ bi
+ rthday $ birthmonth $ birthyear $ userPassword $ jpegPhoto ) )
+olcObjectClasses: {1}( 1.3.6.1.4.1.8301.120.2.1.2 NAME 'd120account' DESC 'A
+ daption of the  posixAccount' SUP top AUXILIARY MUST ( cn $ uid $ uidNumber
+  $ gidNumber $ homeDirectory  $ userPassword ) MAY ( loginShell $ descripti
+ on ) )
+olcObjectClasses: {2}( 1.3.6.1.4.1.8301.120.2.1.3 NAME 'd120mailUser' DESC '
+ Allows the user to receive mails' SUP top AUXILIARY MUST ( mailAlias $ mail
+  $ uid) )
+olcObjectClasses: {3}( 1.3.6.1.4.1.8301.120.2.1.4 NAME 'd120mailGroup' DESC 
+ 'Allows the group to receive mails' SUP top AUXILIARY MUST ( mailAlias $ me
+ mber ) MAY ( description ) )
+olcObjectClasses: {4}( 1.3.6.1.4.1.8301.120.2.1.5 NAME 'd120mailForward' DES
+ C 'Forward object' SUP top STRUCTURAL MUST ( mailAlias $ mailTarget ) MAY (
+  description ) )
+olcObjectClasses: {5}( 1.3.6.1.4.1.8301.120.2.1.6 NAME 'd120mailService' DES
+ C 'Service Account' SUP top AUXILIARY MUST ( mailAlias $uid ) MAY ( descrip
+ tion ) )

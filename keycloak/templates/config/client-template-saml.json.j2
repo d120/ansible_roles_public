@@ -1,0 +1,81 @@
+{
+  "id" : "{{ keycloak.settings.id.client_template_saml }}",
+  "name" : "SAML-Template",
+  "protocol" : "saml",
+  "attributes" : {
+    "display.on.consent.screen" : "false"
+  },
+  "protocolMappers" : [ {
+    "id" : "03285536-99ec-4618-ad49-ee7dacacfc9e",
+    "name" : "property last name",
+    "protocol" : "saml",
+    "protocolMapper" : "saml-user-property-mapper",
+    "consentRequired" : false,
+    "config" : {
+      "attribute.nameformat" : "Basic",
+      "user.attribute" : "lastName",
+      "friendly.name" : "Last Name",
+      "attribute.name" : "lastName"
+    }
+  }, {
+    "id" : "5ff2fc77-fa48-4b5d-ac89-24bc47230c1f",
+    "name" : "group list",
+    "protocol" : "saml",
+    "protocolMapper" : "saml-group-membership-mapper",
+    "consentRequired" : false,
+    "config" : {
+      "single" : "true",
+      "attribute.nameformat" : "Basic",
+      "friendly.name" : "Group",
+      "attribute.name" : "group"
+    }
+  }, {
+    "id" : "0c954687-ea30-430e-bfa6-3d03ca172c39",
+    "name" : "property user name",
+    "protocol" : "saml",
+    "protocolMapper" : "saml-user-property-mapper",
+    "consentRequired" : false,
+    "config" : {
+      "attribute.nameformat" : "Basic",
+      "user.attribute" : "username",
+      "friendly.name" : "User Name",
+      "attribute.name" : "username"
+    }
+  }, {
+    "id" : "b3bde236-ec64-466f-a817-7719ba58c174",
+    "name" : "property locale",
+    "protocol" : "saml",
+    "protocolMapper" : "saml-user-property-mapper",
+    "consentRequired" : false,
+    "config" : {
+      "attribute.nameformat" : "Basic",
+      "user.attribute" : "locale",
+      "friendly.name" : "Locale",
+      "attribute.name" : "locale"
+    }
+  }, {
+    "id" : "aaacb487-914a-4a1c-a6f0-a14c21b3c17a",
+    "name" : "property first name",
+    "protocol" : "saml",
+    "protocolMapper" : "saml-user-property-mapper",
+    "consentRequired" : false,
+    "config" : {
+      "attribute.nameformat" : "Basic",
+      "user.attribute" : "firstName",
+      "friendly.name" : "First Name",
+      "attribute.name" : "firstName"
+    }
+  }, {
+    "id" : "f416d8b1-60a8-4a19-9945-6efaa7ca055f",
+    "name" : "property email",
+    "protocol" : "saml",
+    "protocolMapper" : "saml-user-property-mapper",
+    "consentRequired" : false,
+    "config" : {
+      "attribute.nameformat" : "Basic",
+      "user.attribute" : "email",
+      "friendly.name" : "E-Mail",
+      "attribute.name" : "email"
+    }
+  } ]
+}

@@ -1,0 +1,12 @@
+{
+  "id" : "{{ keycloak.settings.id.ldap_mapper_full_name }}",
+  "name" : "full name",
+  "providerId" : "full-name-ldap-mapper",
+  "providerType" : "org.keycloak.storage.ldap.mappers.LDAPStorageMapper",
+  "parentId" : "{{ keycloak.settings.id.user_federation_ldap }}",
+  "config" : {
+    "read.only" : [ "false" ],
+    "write.only" : [ "false" ],
+    "ldap.full.name.attribute" : [ "displayName" ]
+  }
+}

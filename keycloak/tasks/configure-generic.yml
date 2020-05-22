@@ -1,0 +1,23 @@
+---
+- name: "Configure {{ name }}, {{ file }}: Copy config."
+  template:
+    src: "templates/config/{{ file }}.json.j2"
+    dest: "/root/ansible-keycloak.config/{{ file }}.json"
+    mode: '0600'
+  tags: keycloak
+
+- name: "CLI: {{ name }}, {{ file }}: check existence"
+  command: "kcadm get {{ name }}"
+  ignore_errors: true
+  changed_when: false
+  register: existence
+  tags: keycloak
+
+- name: "CLI: {{ name }}, {{ file }}."
+  shell: |
+    kcadm {{ ('update ' + name) if existence is succeeded else 'create ' + name }} -f /root/ansible-keycloak.config/{{ file }}.json >/dev/null
+    kcadm get {{ name }}
+  register: result
+  # Sorting is needed as the order is not guaranteed to be the same every time.
+  changed_when: (existence.stdout.split('\n') | sort) != (result.stdout.split('\n') | sort)
+  tags: keycloak

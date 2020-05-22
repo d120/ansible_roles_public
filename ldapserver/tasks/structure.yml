@@ -1,0 +1,39 @@
+---
+- name: "Make sure default entries are removed"
+  ldap_entry:
+    dn: "{{ item }}"
+    state: absent
+    bind_dn: "{{ ldap.root_dn }}"
+    bind_pw: "{{ ldap.root_password }}"
+  with_items:
+    - dc=nodomain
+    - cn=admin,dc=nodomain
+  tags: ldap
+
+- name: "Create base dn"
+  ldap_entry:
+    dn: "{{ ldap.base_dn }}"
+    objectClass:
+      - dcObject
+      - organization
+    attributes:
+      o: "{{ ldap.base_dn }}"
+    bind_dn: "{{ ldap.root_dn }}"
+    bind_pw: "{{ ldap.root_password }}"
+  tags: ldap
+
+- name: "Create organizational units"
+  ldap_entry:
+    dn: "ou={{ item }},{{ ldap.base_dn }}"
+    objectClass:
+      - organizationalUnit
+    bind_dn: "{{ ldap.root_dn }}"
+    bind_pw: "{{ ldap.root_password }}"
+  with_items:
+    - People
+    - Group
+    - Services
+    - Hosts
+    - MailForwards
+  tags: ldap
+

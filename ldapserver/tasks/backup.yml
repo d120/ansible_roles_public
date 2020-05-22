@@ -1,0 +1,19 @@
+---
+- name: "Make sure the backup directory exists"
+  file:
+    dest: "{{ ldap.backup_dir }}"
+    state: directory
+  tags: ldap
+
+- name: "Install our LDAP backup script"
+  template:
+    src: templates/dump_ldap_backup.j2
+    dest: /usr/local/sbin/dump_ldap_backup
+    mode: 755
+  tags: ldap
+
+- name: "Set up backup cronjob"
+  template:
+    src: templates/ldapdump-cronjob.j2
+    dest: /etc/cron.d/ldapdump
+  tags: ldap

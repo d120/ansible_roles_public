@@ -1,0 +1,5 @@
+---
+dependencies:
+  - role: java
+    java_version: 11
+  - postgresql

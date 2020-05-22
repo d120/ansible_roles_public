@@ -1,0 +1,58 @@
+---
+- name: "Create a test user"
+  ldap_entry:
+    dn: "uid=fsstest,ou=People,{{ ldap.base_dn }}"
+    objectClass:
+      - d120Person
+      - posixAccount
+    attributes:
+      uid: fsstest
+      uidNumber: 1001
+      gidNumber: 1001
+      cn: fsstest
+      givenName: FSSTest
+      sn: Testbenutzer
+      displayName: FSSTest Testbenutzer
+      homeDirectory: /home/fsstest
+    bind_dn: "{{ ldap.root_dn }}"
+    bind_pw: "{{ ldap.root_password }}"
+  tags: ldap
+
+- name: "Set fsstest properties"
+  ldap_attr:
+    dn: "uid=fsstest,ou=People,{{ ldap.base_dn }}"
+    name: "{{ item.key }}"
+    values: "{{ item.value }}"
+    state: exact
+    bind_dn: "{{ ldap.root_dn }}"
+    bind_pw: "{{ ldap.root_password }}"
+  with_dict:
+    userPassword: "{{ ldap.fsstest_password }}"
+    loginShell: /bin/bash
+  tags: ldap
+
+- name: "Create group {{ item.name }}"
+  ldap_entry:
+    dn: "cn={{ item.name }},ou=Group,{{ ldap.base_dn }}"
+    objectClass:
+      - groupOfNames
+      - posixGroup
+    attributes:
+      cn: "{{ item.name }}"
+      gidNumber: "{{ item.gid }}"
+      member: "uid=fsstest,ou=People,{{ ldap.base_dn }}"
+    bind_dn: "{{ ldap.root_dn }}"
+    bind_pw: "{{ ldap.root_password }}"
+  with_items:
+    - name: fachschaft
+      gid: 1099
+    - name: fss
+      gid: 1090
+    - name: atlasusers
+      gid: 2001
+    - name: vmail
+      gid: 5000
+    - name: guests
+      gid: 1182
+  tags: ldap
+

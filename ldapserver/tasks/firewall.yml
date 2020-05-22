@@ -1,0 +1,13 @@
+---
+- name: "Get facts about installed packages"
+  package_facts:
+    manager: "auto"
+- name: "Update firewall rules"
+  template:
+    src: templates/firewall.rules.j2
+    dest: /etc/shorewall/rules.d/ldap.rules
+  when: 
+    - network.shorewall.enabled
+    - ansible_facts["packages"]["shorewall"] is defined
+  notify: restart shorewall
+  tags: ldap

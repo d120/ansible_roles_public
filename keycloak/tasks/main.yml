@@ -1,0 +1,13 @@
+---
+- include: install.yml
+
+- name: "Flush handlers to restart Keycloak if needed."
+  meta: flush_handlers
+  tags: keycloak
+- name: "Wait for Keycloak to start."
+  wait_for:
+    port: "{{ keycloak.port }}"
+    timeout: 60
+  tags: keycloak
+
+- include: configure.yml

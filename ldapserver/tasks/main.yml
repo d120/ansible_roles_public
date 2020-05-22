@@ -1,0 +1,7 @@
+---
+- include: install.yml
+- include: rootdn.yml
+- include: structure.yml
+- include: defaultdata.yml
+- include: backup.yml
+- include: firewall.yml

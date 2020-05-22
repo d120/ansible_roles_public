@@ -1,0 +1,24 @@
+---
+- name: "Configure client template {{ name }}: Copy config."
+  template:
+    src: templates/config/client-template-{{ name }}.json.j2
+    dest: /root/ansible-keycloak.config/client-template-{{ name }}.json
+    mode: '0600'
+  tags: keycloak
+
+- name: "CLI: Configure client template {{ name }}: check existence."
+  command: "kcadm get client-templates/{{ keycloak.settings.id['client_template_' + name] }}"
+  ignore_errors: true
+  changed_when: false
+  register: existence
+  tags: keycloak
+
+- name: "CLI: Configure client template {{ name }}."
+  shell: |
+    kcadm {{ ('update client-templates/' + keycloak.settings.id['client_template_' + name]) if existence is succeeded else 'create client-templates' }} \
+      -f /root/ansible-keycloak.config/client-template-{{ name }}.json >/dev/null
+    kcadm get client-templates/{{ keycloak.settings.id['client_template_' + name] }}
+  register: result
+  # Sorting is needed as the order is not guaranteed to be the same every time.
+  changed_when: (existence.stdout.split('\n') | sort) != (result.stdout.split('\n') | sort)
+  tags: keycloak

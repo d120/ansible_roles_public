@@ -1,0 +1,68 @@
+---
+- name: "Install ldap server"
+  package: name={{ item }} state=present
+  with_items:
+    - slapd
+  register: ldap_installed
+  tags: ldap
+
+- name: "Install packages"
+  package: name={{ item }} state=present
+  with_items:
+    - ldap-utils
+    - python-ldap
+  tags: ldap
+
+- name: "Ensure LDAP service is stopped, before installing schema"
+  service:
+    name: slapd
+    state: stopped
+  when: ldap_installed is changed
+  tags: ldap
+
+- name: "Replace cn={2}nis.ldif schema with out custom one"
+  copy:
+    src: "files/cn={2}nis.ldif"
+    dest: "/etc/ldap/slapd.d/cn=config/cn=schema/cn={2}nis.ldif"
+    mode: 0600
+    owner: openldap
+    group: openldap
+  when: ldap_installed is changed
+  tags: ldap
+
+- name: "Copy all schemas to server"
+  copy:
+    src: "{{ item }}"
+    dest: "/tmp/{{ item|basename }}"
+  when: ldap_installed|changed
+  with_fileglob: ldifs/*.ldif
+  tags: ldap
+
+- name: "Install schemas"
+  command: "slapadd -n 0 -l /tmp/{{ item|basename }}"
+  when: ldap_installed|changed
+  with_fileglob: ldifs/*.ldif
+  tags: ldap
+
+- name: "Delete temporary ldif files"
+  file:
+    state: absent
+    path: "/tmp/{{ item|basename }}"
+  when: ldap_installed is changed
+  with_fileglob: ldifs/*.ldif
+  tags: ldap
+
+- name: "Ensure correct owner of schema files"
+  file:
+    path: /etc/ldap
+    owner: openldap
+    group: openldap
+    recurse: yes
+  tags: ldap
+
+- name: "Ensure LDAP service is started and enabled on boot"
+  service:
+    name: slapd
+    state: started
+    enabled: yes
+  tags: ldap

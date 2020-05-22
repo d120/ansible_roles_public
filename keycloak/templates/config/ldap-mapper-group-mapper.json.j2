@@ -1,0 +1,21 @@
+{
+  "id" : "{{ keycloak.settings.id.ldap_mapper_group_mapper }}",
+  "name" : "group mapper",
+  "providerId" : "group-ldap-mapper",
+  "providerType" : "org.keycloak.storage.ldap.mappers.LDAPStorageMapper",
+  "parentId" : "{{ keycloak.settings.id.user_federation_ldap }}",
+  "config" : {
+    "mode" : [ "LDAP_ONLY" ],
+    "membership.attribute.type" : [ "DN" ],
+    "user.roles.retrieve.strategy" : [ "LOAD_GROUPS_BY_MEMBER_ATTRIBUTE" ],
+    "group.name.ldap.attribute" : [ "cn" ],
+    "membership.ldap.attribute" : [ "member" ],
+    "membership.user.ldap.attribute" : [ "uid" ],
+    "ignore.missing.groups" : [ "false" ],
+    "preserve.group.inheritance" : [ "true" ],
+    "groups.dn" : [ "{{ ldap.group_search_base }}" ],
+    "group.object.classes" : [ "groupOfNames" ],
+    "memberof.ldap.attribute" : [ "memberOf" ],
+    "drop.non.existing.groups.during.sync" : [ "true" ]
+  }
+}
