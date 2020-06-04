@@ -1,0 +1,27 @@
+---
+- name: "Make sure the backup directory exists"
+  file:
+    dest: "{{ postgres.backup_dir }}"
+    state: directory
+  when: postgres.backup_dir is defined
+  tags: postgres
+
+- name: "Install postgres backup script"
+  template:
+    src: templates/dump_postgres_backup.j2
+    dest: /usr/local/sbin/dump_postgres_backup
+    mode: 0755
+  when: postgres.backup_dir is defined
+  tags: postgres
+
+- name: "Set up backup cronjob"
+  cron:
+    name: "postgres backup dump"
+    minute: 5
+    hour: "*/2"
+    user: root
+    job: /usr/local/sbin/dump_postgres_backup
+    cron_file: postgresbackup
+  when: postgres.backup_dir is defined
+  tags: postgres
+

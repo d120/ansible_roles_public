@@ -1,0 +1,13 @@
+# Managed by Ansible. DO NOT CHANGE!
+
+
+# TYPE  DATABASE        USER            ADDRESS                 METHOD  [OPTIONS]
+
+# Postgres socket magic.
+local   all             postgres                                peer    map=root_as_postgres
+
+# Socket connections.
+local   all             all                                     peer
+
+# Localhost IPv4 connections.
+host    all             all             127.0.0.1/32            md5

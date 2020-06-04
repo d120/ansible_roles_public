@@ -1,0 +1,38 @@
+---
+- name: "Install PostgreSQL."
+  apt:
+    package:
+      - postgresql
+      - python-psycopg2
+      - python3-psycopg2
+      - libdbd-pg-perl
+  tags:
+    - postgres
+    - database
+
+- name: "Configure PostgreSQL."
+  template:
+    src: "templates/{{ item }}.conf.j2"
+    dest: "/etc/postgresql/11/main/{{ item }}.conf"
+    owner: postgres
+    group: postgres
+    mode: '0640'
+  with_items:
+    - pg_hba
+    - pg_ident
+  notify: restart database
+  tags:
+    - postgres
+    - database
+
+- name: "Ensure postgresql is started and enabled on boot."
+  service:
+    name: postgresql
+    state: started
+    enabled: true
+  tags:
+    - postgres
+    - database
+
+- name: "Run all handlers to ensure configuration is picked up."
+  meta: flush_handlers

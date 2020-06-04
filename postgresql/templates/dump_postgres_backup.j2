@@ -1,0 +1,8 @@
+#!/bin/bash
+
+BACKUP_DIR="{{ postgres.backup_dir }}"
+
+mkdir -p $BACKUP_DIR
+cd $BACKUP_DIR
+
+psql -U postgres -c "SELECT datname FROM pg_database;" -tA | while read dbname; do pg_dump -U postgres "$dbname" | gzip > "$dbname"-$(date "+%A")-$(date "+%H").psql.gz; done
