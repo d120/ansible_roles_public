@@ -1,0 +1,18 @@
+---
+matrix:
+  server_name: example.com
+  base_url: matrix.example.com
+  db:
+    name: matrix
+    user: synapse
+    password: changeme
+  oidc:
+    issuer: "https://sso.example.com/auth/realms/master"
+    client_id: "matrix"
+    client_secret: "changeme"
+  mail:
+    server: mail.example.com
+    port: 587
+    user: matrix
+    password: "changeme"
+    from: "matrix@example.com"

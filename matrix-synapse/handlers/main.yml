@@ -1,0 +1,10 @@
+---
+- name: "restart nginx"
+  service:
+    name: nginx
+    state: reloaded
+
+- name: "restart synapse"
+  service:
+    name: matrix-synapse
+    state: restarted

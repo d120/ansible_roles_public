@@ -1,0 +1,27 @@
+---
+- block:
+    - name: Install basic requirements
+      apt:
+        name:
+          - gpg
+          - libpq5
+        state: present
+
+    - name: Add matrix apt key
+      apt_key:
+        id: AAF9AE843A7584B5A3E4CD2BCF45A512DE2DA058
+        url: https://packages.matrix.org/debian/matrix-org-archive-keyring.gpg
+        state: present
+
+    - name: Add matrix repo
+      apt_repository:
+        repo: "deb https://packages.matrix.org/debian/ {{ ansible_distribution_release | lower }} main"
+        state: present
+
+    - name: Install matrix and dependencies
+      apt:
+        name:
+          - matrix-synapse-py3
+        state: present
+
+  tags: matrix, matrix-install

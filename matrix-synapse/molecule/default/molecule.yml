@@ -1,0 +1,22 @@
+---
+dependency:
+  name: galaxy
+driver:
+  name: podman
+lint: |
+  ansible-lint -x 701
+platforms:
+  - name: instance
+    image: jrei/systemd-debian:latest
+    pre_build_image: false
+    privileged: true
+    tty: true
+    command: "/usr/sbin/init"
+provisioner:
+  name: ansible
+  log: true
+  config_options:
+    defaults:
+      hash_behaviour: merge
+verifier:
+  name: testinfra
