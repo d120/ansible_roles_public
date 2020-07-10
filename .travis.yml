@@ -14,20 +14,14 @@ addons:
   apt:
     packages:
     - python-pip
-    - podman
 
 install:
   # Install ansible
-  - pip install ansible, molecule
+  - pip install ansible ansible-lint
 
   # Check ansible version
   - ansible --version
 
-  # Create ansible.cfg with correct roles_path
-  #- printf '[defaults]\nroles_path=../' >ansible.cfg
-
 script:
-  # Basic role syntax check
-  - cd $ROLE
-  - ansible-playbook tests/test.yml -i $ROLE/tests/inventory --syntax-check
-  - molcule verify
+  - ansible-playbook $ROLE/tests/test.yml -i $ROLE/tests/inventory --syntax-check
+  - ansible-lint -x701 $ROLE
