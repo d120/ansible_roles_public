@@ -14,10 +14,11 @@ addons:
   apt:
     packages:
     - python-pip
+    - podman
 
 install:
   # Install ansible
-  - pip install ansible
+  - pip install ansible, molecule
 
   # Check ansible version
   - ansible --version
@@ -27,4 +28,6 @@ install:
 
 script:
   # Basic role syntax check
-  - ansible-playbook $ROLE/tests/test.yml -i $ROLE/tests/inventory --syntax-check
+  - cd $ROLE
+  - ansible-playbook tests/test.yml -i $ROLE/tests/inventory --syntax-check
+  - molcule verify

@@ -27,7 +27,6 @@
       template:
         src: homeserver.yml.j2
         dest: /etc/matrix-synapse/homeserver.yaml
-        daemon_reload: true
       notify: restart synapse
 
   tags: matrix, matrix-config

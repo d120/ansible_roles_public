@@ -9,9 +9,11 @@ platforms:
   - name: instance
     image: jrei/systemd-debian:latest
     pre_build_image: false
-    privileged: true
+    priviliged: true
     tty: true
-    command: "/usr/sbin/init"
+    override_command: false
+    volumes:
+      - /sys/fs/cgroup:/sys/fs/cgroup:ro
 provisioner:
   name: ansible
   log: true
