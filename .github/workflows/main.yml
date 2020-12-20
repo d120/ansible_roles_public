@@ -13,13 +13,13 @@ on:
   # Allows you to run this workflow manually from the Actions tab
   workflow_dispatch:
 
-strategy:
-  matrix:
-    role:
-      - matrix-synapse
   
 jobs:
   test:
+    strategy:
+      matrix:
+        role:
+          - matrix-synapse
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
@@ -29,9 +29,10 @@ jobs:
       - name: Install test dependencies
         run: pip3 install molecule[docker] yamllint ansible-lint
       - name: Run molecule tests
-        run:|
-          cd {{ $GITHUB_WORKSPACE}}{{ $matrix.role }}
-          molecule test
         env:
           PY_COLORS: 1
           ANSIBLE_FORCE_COLOR: 1
+          ROLE: ${{ matrix.role }}
+        run: |
+          cd $GITHUB_WORKSPACE/$ROLE
+          molecule test
