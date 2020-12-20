@@ -4,6 +4,7 @@
       template:
         src: server_name.yml.j2
         dest: /etc/matrix-synapse/conf.d/server_name.yaml
+        mode: 0644
 
     - name: Add postgres database
       postgresql_db:
@@ -27,6 +28,7 @@
       template:
         src: homeserver.yml.j2
         dest: /etc/matrix-synapse/homeserver.yaml
+        mode: 0644
       notify: restart synapse
 
   tags: matrix, matrix-config

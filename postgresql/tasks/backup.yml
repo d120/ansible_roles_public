@@ -3,6 +3,7 @@
   file:
     dest: "{{ postgres.backup_dir }}"
     state: directory
+    mode: 0700
   when: postgres.backup_dir is defined
   tags: postgres
 

@@ -2,18 +2,17 @@
 dependency:
   name: galaxy
 driver:
-  name: podman
+  name: docker
 lint: |
-  ansible-lint -x 701
+  ansible-lint -x 701,106
 platforms:
   - name: instance
-    image: jrei/systemd-debian:latest
-    pre_build_image: false
-    priviliged: true
-    tty: true
-    override_command: false
+    image: geerlingguy/docker-debian10-ansible
+    pre_build_image: true
+    command: ""
     volumes:
       - /sys/fs/cgroup:/sys/fs/cgroup:ro
+    privileged: true
 provisioner:
   name: ansible
   log: true
