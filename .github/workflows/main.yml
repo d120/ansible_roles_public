@@ -1,0 +1,38 @@
+# This is a basic workflow to help you get started with Actions
+
+name: Molecule Tests
+
+# Controls when the action will run. 
+on:
+  # Triggers the workflow on push or pull request events but only for the master branch
+  push:
+    branches: [ master ]
+  pull_request:
+    branches: [ master ]
+
+  # Allows you to run this workflow manually from the Actions tab
+  workflow_dispatch:
+
+  
+jobs:
+  test:
+    strategy:
+      matrix:
+        role:
+          - matrix-synapse
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - uses: actions/setup-python@v2
+        with:
+          python-version: '3.x'   
+      - name: Install test dependencies
+        run: pip3 install molecule[docker] yamllint ansible-lint pytest-molecule
+      - name: Run molecule tests
+        env:
+          PY_COLORS: 1
+          ANSIBLE_FORCE_COLOR: 1
+          ROLE: ${{ matrix.role }}
+        run: |
+          cd $GITHUB_WORKSPACE/$ROLE
+          molecule test
