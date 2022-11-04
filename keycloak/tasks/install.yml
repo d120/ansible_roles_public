@@ -23,86 +23,65 @@
   tags: keycloak
 
 - name: "Create required directories."
-  file: path={{ item }} state=directory
-  with_items:
-    - /root/ansible-keycloak
-    - "{{ keycloak.settings.dest }}/modules/system/layers/keycloak/org/postgresql/main"
+  file:
+    path: /root/ansible-keycloak
+    state: directory
   tags: keycloak
 
-- name: "Download and unpack Keycloak tarball."
+- name: "Download Keycloak tarball."
+  get_url:
+    url: "{{ keycloak.settings.dist_url }}"
+    checksum: "{{ keycloak.settings.dist_hash }}"
+    dest: "/root/ansible-keycloak/keycloak.tar.gz"
+  tags: keycloak
+
+- name: "Unpack Keycloak tarball."
   unarchive:
-    src: "{{ keycloak.settings.dist_url }}"
+    src: "/root/ansible-keycloak/keycloak.tar.gz"
     dest: /root/ansible-keycloak
     remote_src: true
     creates: "/root/ansible-keycloak/{{ keycloak.settings.dist_dir }}"
-  register: downloaded
+  register: unpacking
   notify: restart keycloak
-  tags: keycloak
-
-- name: "Check if Keycloak does exist."
-  stat:
-    path: "{{ keycloak.settings.dest }}/bin/launcher.jar"
-  register: keycloak_exists
   tags: keycloak
 
 - name: "Copy Keycloak files in place."
-  shell: "cp -rT '/root/ansible-keycloak/{{ keycloak.settings.dist_dir }}' '{{ keycloak.settings.dest }}'"
-  when: not keycloak_exists.stat.exists or downloaded.changed
-  register: copied
+  copy:
+    src: "/root/ansible-keycloak/{{ keycloak.settings.dist_dir }}/"
+    dest: "{{ keycloak.settings.dest }}"
+    remote_src: true
+    owner: keycloak
+    group: keycloak
+    force: true
+    mode: u=rwX,g=rX,o=
+  when: unpacking.changed
   notify: restart keycloak
   tags: keycloak
 
-- name: "Ensure permissions are set correctly."
-  file:
-    path: "{{ keycloak.settings.dest }}"
+- name: "Install Keycloak theme"
+  copy:
+    src: "files/themes/d120/"
+    dest: "{{ keycloak.settings.dest }}/themes/d120/"
     owner: keycloak
     group: keycloak
     mode: u=rwX,g=rX,o=
-    recurse: true
-  notify: restart keycloak
-  when: copied.changed
   tags: keycloak
 
-- name: "Download PostgreSQL driver."
-  get_url:
-    url: "{{ keycloak.settings.db_driver_url }}"
-    dest: "{{ keycloak.settings.dest }}/modules/system/layers/keycloak/org/postgresql/main/{{ keycloak.settings.db_driver_filename }}"
-    owner: keycloak
-    group: keycloak
-  notify: restart keycloak
-  tags: keycloak
-
-- name: "Configure PostgreSQL driver module."
-  template:
-    src: templates/postgresql-module.xml.j2
-    dest: "{{ keycloak.settings.dest }}/modules/system/layers/keycloak/org/postgresql/main/module.xml"
-    owner: keycloak
-    group: keycloak
-  notify: restart keycloak
-  tags: keycloak
 
 - name: "Configure Keycloak."
   template:
-    src: templates/standalone.xml.j2
-    dest: "{{ keycloak.settings.dest }}/standalone/configuration/standalone.xml"
+    src: templates/keycloak.conf.j2
+    dest: "{{ keycloak.settings.dest }}/conf/keycloak.conf"
     owner: keycloak
     group: keycloak
-    mode: '0600'
+    mode: "0600"
   notify: restart keycloak
   tags: keycloak
 
-- name: "Deploy SystemD file."
+- name: "Deploy SystemD files."
   template:
     src: templates/keycloak.service.j2
     dest: /etc/systemd/system/keycloak.service
-  tags: keycloak
-
-- name: "Deploy d120 theme"
-  copy:
-    src: files/d120.jar
-    dest: "{{ keycloak.settings.dest }}/standalone/deployments"
-    owner: keycloak
-    group: keycloak
   tags: keycloak
 
 - name: "Ensure keycloak is started and enabled on boot."
@@ -113,12 +92,9 @@
     daemon_reload: true
   tags: keycloak
 
-- name: "Create admin user."
-  shell: |
-    ./bin/add-user-keycloak.sh -r master -u {{ keycloak.settings.admin_user }} -p {{ keycloak.settings.admin_password }}
-    touch admin-user-created
-  args:
-    chdir: "{{ keycloak.settings.dest }}"
-    creates: "{{ keycloak.settings.dest }}/admin-user-created"
-  notify: restart keycloak
+- name: "Install KCADM."
+  alternatives:
+    name: kcadm
+    link: /usr/bin/kcadm
+    path: "{{ keycloak.settings.dest }}/bin/kcadm.sh"
   tags: keycloak

@@ -10,4 +10,4 @@
     timeout: 60
   tags: keycloak
 
-- include: configure.yml
+# - include: configure.yml

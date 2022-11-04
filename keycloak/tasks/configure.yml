@@ -1,11 +1,4 @@
 ---
-- name: "Install admin CLI."
-  alternatives:
-    name: kcadm
-    link: /usr/bin/kcadm
-    path: "{{ keycloak.settings.dest }}/bin/kcadm.sh"
-  tags: keycloak
-
 - name: "Create required directories."
   file:
     path: /root/ansible-keycloak.config
@@ -23,88 +16,88 @@
 # Configure Master Realm.
 # TODO: Email configuration.
 
-- name: "Configure master realm: Copy config."
-  template:
-    src: templates/config/realm-master.json.j2
-    dest: /root/ansible-keycloak.config/realm-master.json
-  tags: keycloak
+# - name: "Configure master realm: Copy config."
+#   template:
+#     src: templates/config/realm-master.json.j2
+#     dest: /root/ansible-keycloak.config/realm-master.json
+#   tags: keycloak
 
-- name: "CLI: Configure master realm: check existence."
-  command: "kcadm get realms/{{ keycloak.settings.id.realm }}"
-  ignore_errors: true
-  changed_when: false
-  register: existence
-  tags: keycloak
+# - name: "CLI: Configure master realm: check existence."
+#   command: "kcadm get realms/{{ keycloak.settings.id.realm }}"
+#   ignore_errors: true
+#   changed_when: false
+#   register: existence
+#   tags: keycloak
 
-- name: "CLI: Configure master realm."
-  shell: |
-    kcadm {{ 'update' if existence is succeeded else 'create' }} realms/{{ keycloak.settings.id.realm }} \
-      -f /root/ansible-keycloak.config/realm-master.json >/dev/null
-    kcadm get realms/{{ keycloak.settings.id.realm }}
-  register: result
-  # Sorting is needed as the order is not guaranteed to be the same every time.
-  changed_when: (existence.stdout.split('\n') | sort) != (result.stdout.split('\n') | sort)
-  tags: keycloak
-
-
-# Configure LDAP user federation.
-
-- name: "Configure LDAP user federation."
-  include: configure-component.yml name='Configure LDAP user federation' file={{ item.file }} uuid={{ item.uuid }}
-  with_items:
-    - file: user-federation-ldap
-      uuid: "{{ keycloak.settings.id.user_federation_ldap }}"
-    - file: ldap-mapper-creation-date
-      uuid: "{{ keycloak.settings.id.ldap_mapper_creation_date }}"
-    - file: ldap-mapper-email
-      uuid: "{{ keycloak.settings.id.ldap_mapper_email }}"
-    - file: ldap-mapper-first-name
-      uuid: "{{ keycloak.settings.id.ldap_mapper_first_name }}"
-    - file: ldap-mapper-full-name
-      uuid: "{{ keycloak.settings.id.ldap_mapper_full_name }}"
-    - file: ldap-mapper-group-mapper
-      uuid: "{{ keycloak.settings.id.ldap_mapper_group_mapper }}"
-    - file: ldap-mapper-last-name
-      uuid: "{{ keycloak.settings.id.ldap_mapper_last_name }}"
-    - file: ldap-mapper-modify-date
-      uuid: "{{ keycloak.settings.id.ldap_mapper_modify_date }}"
-    - file: ldap-mapper-username
-      uuid: "{{ keycloak.settings.id.ldap_mapper_username }}"
-  tags: keycloak
-
-- name: "CLI: Synchronize all users."
-  command: "kcadm create user-storage/{{ keycloak.settings.id.user_federation_ldap }}/sync?action=triggerFullSync"
-  tags: keycloak
+# - name: "CLI: Configure master realm."
+#   shell: |
+#     kcadm {{ 'update' if existence is succeeded else 'create' }} realms/{{ keycloak.settings.id.realm }} \
+#       -f /root/ansible-keycloak.config/realm-master.json >/dev/null
+#     kcadm get realms/{{ keycloak.settings.id.realm }}
+#   register: result
+#   # Sorting is needed as the order is not guaranteed to be the same every time.
+#   changed_when: (existence.stdout.split('\n') | sort) != (result.stdout.split('\n') | sort)
+#   tags: keycloak
 
 
-# Configure client template OpenID/SAML.
+# # Configure LDAP user federation.
 
-- name: "Configure client templates OpenID/SAML."
-  include: configure-clienttemplate.yml name={{ item }}
-  with_items:
-    - openid
-    - saml
-  tags: keycloak
+# - name: "Configure LDAP user federation."
+#   include: configure-component.yml name='Configure LDAP user federation' file={{ item.file }} uuid={{ item.uuid }}
+#   with_items:
+#     - file: user-federation-ldap
+#       uuid: "{{ keycloak.settings.id.user_federation_ldap }}"
+#     - file: ldap-mapper-creation-date
+#       uuid: "{{ keycloak.settings.id.ldap_mapper_creation_date }}"
+#     - file: ldap-mapper-email
+#       uuid: "{{ keycloak.settings.id.ldap_mapper_email }}"
+#     - file: ldap-mapper-first-name
+#       uuid: "{{ keycloak.settings.id.ldap_mapper_first_name }}"
+#     - file: ldap-mapper-full-name
+#       uuid: "{{ keycloak.settings.id.ldap_mapper_full_name }}"
+#     - file: ldap-mapper-group-mapper
+#       uuid: "{{ keycloak.settings.id.ldap_mapper_group_mapper }}"
+#     - file: ldap-mapper-last-name
+#       uuid: "{{ keycloak.settings.id.ldap_mapper_last_name }}"
+#     - file: ldap-mapper-modify-date
+#       uuid: "{{ keycloak.settings.id.ldap_mapper_modify_date }}"
+#     - file: ldap-mapper-username
+#       uuid: "{{ keycloak.settings.id.ldap_mapper_username }}"
+#   tags: keycloak
+
+# - name: "CLI: Synchronize all users."
+#   command: "kcadm create user-storage/{{ keycloak.settings.id.user_federation_ldap }}/sync?action=triggerFullSync"
+#   tags: keycloak
+
+
+# # Configure client template OpenID/SAML.
+
+# - name: "Configure client templates OpenID/SAML."
+#   include: configure-clienttemplate.yml name={{ item }}
+#   with_items:
+#     - openid
+#     - saml
+#   tags: keycloak
 
 
 
-# Configure default client scopes.
+# # Configure default client scopes.
 
-- name: "Configure default client scopes: Check current configuration."
-  command: "kcadm get default-default-client-scopes"
-  ignore_errors: true
-  changed_when: false
-  register: defaultclientscopes
-  tags: keycloak
+# - name: "Configure default client scopes: Check current configuration."
+#   command: "kcadm get default-default-client-scopes"
+#   ignore_errors: true
+#   changed_when: false
+#   register: defaultclientscopes
+#   tags: keycloak
 
-- name: "Configure default client scopes: enable OpenID."
-  command: "kcadm update default-default-client-scopes/{{ keycloak.settings.id.client_template_openid }}"
-  ignore_errors: true
-  when: keycloak.settings.id.client_template_openid not in defaultclientscopes.stdout
-  tags: keycloak
+# - name: "Configure default client scopes: enable OpenID."
+#   command: "kcadm update default-default-client-scopes/{{ keycloak.settings.id.client_template_openid }}"
+#   ignore_errors: true
+#   when: keycloak.settings.id.client_template_openid not in defaultclientscopes.stdout
+#   tags: keycloak
 
-- name: "Configure default client scopes: enable SAML."
-  command: "kcadm update default-default-client-scopes/{{ keycloak.settings.id.client_template_saml }}"
-  ignore_errors: true
-  when: keycloak.settings.id.client_template_saml not in defaultclientscopes.stdout
-  tags: keycloak
+# - name: "Configure default client scopes: enable SAML."
+#   command: "kcadm update default-default-client-scopes/{{ keycloak.settings.id.client_template_saml }}"
+#   ignore_errors: true
+#   when: keycloak.settings.id.client_template_saml not in defaultclientscopes.stdout
+#   tags: keycloak

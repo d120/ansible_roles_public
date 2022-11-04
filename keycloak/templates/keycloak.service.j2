@@ -11,7 +11,7 @@ StandardError=syslog
 SyslogIdentifier=keycloak
 User=keycloak
 Group=keycloak
-ExecStart={{ keycloak.settings.dest }}/bin/standalone.sh
+ExecStart={{ keycloak.settings.dest }}/bin/kc.sh start
 WorkingDirectory={{ keycloak.settings.dest }}
 RemainAfterExit=yes
 
