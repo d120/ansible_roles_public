@@ -1,5 +1,5 @@
 ---
-- include: install.yml
+- import_tasks: install.yml
 
 - name: "Flush handlers to restart Keycloak if needed."
   meta: flush_handlers
@@ -10,4 +10,4 @@
     timeout: 60
   tags: keycloak
 
-# - include: configure.yml
+# - import_tasks: configure.yml
